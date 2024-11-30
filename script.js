@@ -154,24 +154,48 @@ const content = [
 Найти бы желание позже всё снять`,
   },
   { 
-    riddle: `riddle<br>riddle<br>riddle<br>riddle`,
-    answer: `answer`,
-    prize: `prize<br>prize<br>prize<br>prize`,
+    riddle: `Карусели крутятся, лампочки мигают<br>
+Сладких леденцов полные прилавки<br>
+Лица у пришедших радостно сияют<br>
+Не дойти до Санты через эту давку`,
+    answer: `ярмарка`,
+    prize: `Зазвенели бубенцы, заиграла музыка<br>
+Заплясали вечером яркие огни<br>
+Распустился фейерверк красочным пузыриком<br>
+Разогналась карусель - попробуй догони!`,
   },
   { 
-    riddle: `riddle<br>riddle<br>riddle<br>riddle`,
-    answer: `answer`,
-    prize: `prize<br>prize<br>prize<br>prize`,
+    riddle: `Снег захрустел под полозьями и заскрипели сани<br>
+Лёгким дымком заструился пар изо рта<br>
+Рот пошире открывай на этот сладкий input<br>
+Чашка в замёрзших руках - это просто мечта!`,
+    answer: `пряник`,
+    prize: `Тёплым потоком наполнится тело от чая<br>
+Сладким комочком растает твой пряник во рту<br>
+Больше не страшно, пускай на дворе холодет<br>
+Знаешь теперь, чем согреться тебе поутру`,
   },
   { 
-    riddle: `riddle<br>riddle<br>riddle<br>riddle`,
-    answer: `answer`,
-    prize: `prize<br>prize<br>prize<br>prize`,
+    riddle: `Вот чудесная картинка<br>
+Дом стоит и ёлка рядом<br>
+А теперь тот дом встряхни-ка<br>
+Тут же вьюга налетает`,
+    answer: `снежный шар`,
+    prize: `Та забавная вещица<br>
+Улучшает настроение<br>
+Пусть внутри снежок искриться<br>
+А снаружи всем теплее`,
   },
   { 
-    riddle: `riddle<br>riddle<br>riddle<br>riddle`,
-    answer: `answer`,
-    prize: `prize<br>prize<br>prize<br>prize`,
+    riddle: `Все говорят - в новогоднюю ночь<br>
+Могут сбываться мечты о достатке<br>
+Дух рождества обещал нам помочь<br>
+input для нас зажигает украдкой`,
+    answer: `свечи`,
+    prize: `Радует слух треск горящих свечей<br>
+Держимся мы в этот вечер за руки<br>
+Я бесконечно влюблён в свет очей<br>
+Я бы до смерти смотрел друг на друга`,
   },
   { 
     riddle: `riddle<br>riddle<br>riddle<br>riddle`,
@@ -257,9 +281,11 @@ const placeholders = [
   'бе-бе-бе',
 ];
 
-// const dayIndex = new Date().getDate() - 1;
-const dayIndex = Math.floor(Math.random() * content.length);
-console.log(dayIndex);
+const storedDayIndex = +localStorage.getItem('advent-2024');
+
+const dayIndex = new Date().getDate() - 1;
+// const dayIndex = Math.floor(Math.random() * content.length);
+// console.log(dayIndex);
 
 const body = document.querySelector('body');
 body.style.backgroundImage = `url('img/${dayIndex}.jpg')`;
@@ -292,25 +318,34 @@ if (isInnerInput) {
 }
 input.autofocus = true;
 input.focus();
-
-input.addEventListener('keypress', (event) => {
-  if (event.key === 'Enter') {
-    if (input.value.toLowerCase().replace('ё', 'е') === content[dayIndex].answer) {
-      if (isInnerInput) {
-        riddle.innerHTML = riddle.innerHTML.replace(input.outerHTML, content[dayIndex].answer);
-      } else {
-        main.removeChild(input);
-      }
-      main.append(prize);
-    } else {
-      input.value = '';
-      const placeholder = placeholders[Math.floor(Math.random() * placeholders.length)];
-      input.style.width = `${placeholder.length}ch`;
-      input.placeholder = placeholder;
-      setTimeout(() => {
-        input.placeholder = '';
-        input.style.width = `${content[dayIndex].answer.length}ch`;
-      }, 1000);
-    }
+if (storedDayIndex === dayIndex) {
+  if (isInnerInput) {
+    riddle.innerHTML = riddle.innerHTML.replace(input.outerHTML, content[dayIndex].answer);
+  } else {
+    main.removeChild(input);
   }
-});
+  main.append(prize);
+} else {
+  input.addEventListener('keypress', (event) => {
+    if (event.key === 'Enter') {
+      if (input.value.toLowerCase().replace('ё', 'е') === content[dayIndex].answer) {
+        if (isInnerInput) {
+          riddle.innerHTML = riddle.innerHTML.replace(input.outerHTML, content[dayIndex].answer);
+        } else {
+          main.removeChild(input);
+        }
+        main.append(prize);
+        localStorage.setItem('advent-2024', dayIndex);
+      } else {
+        input.value = '';
+        const placeholder = placeholders[Math.floor(Math.random() * placeholders.length)];
+        input.style.width = `${placeholder.length}ch`;
+        input.placeholder = placeholder;
+        setTimeout(() => {
+          input.placeholder = '';
+          input.style.width = `${content[dayIndex].answer.length}ch`;
+        }, 1000);
+      }
+    }
+  });
+}
