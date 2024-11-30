@@ -262,7 +262,7 @@ const dayIndex = Math.floor(Math.random() * content.length);
 console.log(dayIndex);
 
 const body = document.querySelector('body');
-body.style.backgroundImage = `url('img/${Math.ceil(Math.random() * content.length)}.jpg')`;
+body.style.backgroundImage = `url('img/${dayIndex}.jpg')`;
 body.style.backgroundSize = 'cover';
 body.style.backgroundRepeat = 'no-repeat';
 body.style.backgroundPosition = 'center';
