@@ -388,7 +388,7 @@ if (isInnerInput) {
 }
 input.autofocus = true;
 input.focus();
-if (storedDayIndex >= dayIndex) {
+if (storedDayIndex == dayIndex) {
   if (isInnerInput) {
     riddle.innerHTML = riddle.innerHTML.replace(input.outerHTML, content[dayIndex].answer);
   } else {
