@@ -398,7 +398,7 @@ if (storedDayIndex == dayIndex) {
 } else {
   input.addEventListener('keypress', (event) => {
     if (event.key === 'Enter') {
-      if (input.value.toLowerCase().replace('ё', 'е') === content[dayIndex].answer) {
+      if (input.value.trim().toLowerCase().replace('ё', 'е') === content[dayIndex].answer) {
         if (isInnerInput) {
           riddle.innerHTML = riddle.innerHTML.replace(input.outerHTML, content[dayIndex].answer);
         } else {
