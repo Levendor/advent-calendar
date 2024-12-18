@@ -456,7 +456,7 @@ document.addEventListener('touchend', (event) => {
   touchendX = event.changedTouches[0].screenX;
   const diff = touchendX - touchstartX;
   const direction = diff < 0 ? 'right' : 'left';
-  Math.abs(diff) > 100 && handleGesture(direction);
+  if (Math.abs(diff) > 100) handleGesture(direction);
 });
 
 let mousedownX = 0;
