@@ -355,67 +355,120 @@ const placeholders = [
 
 const storedDayIndex = localStorage.getItem('advent-2024');
 
-const dayIndex = new Date().getDate() - 1;
+const currentDayIndex = new Date().getDate() - 1;
 
-const body = document.querySelector('body');
-body.style.backgroundImage = `url('img/${dayIndex}.jpg')`;
-body.style.backgroundSize = 'cover';
-body.style.backgroundRepeat = 'no-repeat';
-body.style.backgroundPosition = 'center';
-
-const main = document.getElementById('main');
-
-const riddle = document.createElement('div');
-riddle.classList.add('riddle');
-riddle.innerHTML = content[dayIndex].riddle;
-
-let input = document.createElement('input');
-input.classList.add('answer');
-
-const prize = document.createElement('div');
-prize.classList.add('prize');
-prize.innerHTML = content[dayIndex].prize;
-
-main.append(riddle);
-const isInnerInput = riddle.innerHTML.includes('input');
-if (isInnerInput) {
-  riddle.innerHTML = riddle.innerHTML.replace('input', input.outerHTML);
-  input = main.querySelector('.answer');
-  input.style.display = 'inline';
-  input.style.width = `${content[dayIndex].answer.length}ch`;
-} else {
-  main.append(input);
-}
-input.autofocus = true;
-input.focus();
-if (storedDayIndex == dayIndex) {
+const render = (dayIndex) => {
+  console.log('Day index: ', dayIndex);
+  const body = document.querySelector('body');
+  body.style.backgroundImage = `url('img/${dayIndex}.jpg')`;
+  body.style.backgroundSize = 'cover';
+  body.style.backgroundRepeat = 'no-repeat';
+  body.style.backgroundPosition = 'center';
+  
+  const main = document.getElementById('main');
+  main.innerHTML = '';
+  
+  const riddle = document.createElement('div');
+  riddle.classList.add('riddle');
+  riddle.innerHTML = content[dayIndex].riddle;
+  
+  let input = document.createElement('input');
+  input.classList.add('answer');
+  
+  const prize = document.createElement('div');
+  prize.classList.add('prize');
+  prize.innerHTML = content[dayIndex].prize;
+  
+  main.append(riddle);
+  const isInnerInput = riddle.innerHTML.includes('input');
   if (isInnerInput) {
-    riddle.innerHTML = riddle.innerHTML.replace(input.outerHTML, content[dayIndex].answer);
+    riddle.innerHTML = riddle.innerHTML.replace('input', input.outerHTML);
+    input = main.querySelector('.answer');
+    input.style.display = 'inline';
+    input.style.width = `${content[dayIndex].answer.length}ch`;
   } else {
-    main.removeChild(input);
+    main.append(input);
   }
-  main.append(prize);
-} else {
-  input.addEventListener('keypress', (event) => {
-    if (event.key === 'Enter') {
-      if (input.value.trim().toLowerCase().replace('ё', 'е') === content[dayIndex].answer) {
-        if (isInnerInput) {
-          riddle.innerHTML = riddle.innerHTML.replace(input.outerHTML, content[dayIndex].answer);
-        } else {
-          main.removeChild(input);
-        }
-        main.append(prize);
-        localStorage.setItem('advent-2024', dayIndex);
-      } else {
-        input.value = '';
-        const placeholder = placeholders[Math.floor(Math.random() * placeholders.length)];
-        input.style.width = `${placeholder.length}ch`;
-        input.placeholder = placeholder;
-        setTimeout(() => {
-          input.placeholder = '';
-          input.style.width = `${content[dayIndex].answer.length}ch`;
-        }, 1000);
-      }
+  input.autofocus = true;
+  input.focus();
+  if (storedDayIndex && storedDayIndex >= dayIndex) {
+    if (isInnerInput) {
+      riddle.innerHTML = riddle.innerHTML.replace(input.outerHTML, content[dayIndex].answer);
+    } else {
+      main.removeChild(input);
     }
-  });
-}
+    main.append(prize);
+  } else {
+    input.addEventListener('keypress', (event) => {
+      if (event.key === 'Enter') {
+        if (input.value.trim().toLowerCase().replace('ё', 'е') === content[dayIndex].answer) {
+          if (isInnerInput) {
+            riddle.innerHTML = riddle.innerHTML.replace(input.outerHTML, content[dayIndex].answer);
+          } else {
+            main.removeChild(input);
+          }
+          main.append(prize);
+          localStorage.setItem('advent-2024', dayIndex);
+        } else {
+          input.value = '';
+          const placeholder = placeholders[Math.floor(Math.random() * placeholders.length)];
+          input.style.width = `${placeholder.length}ch`;
+          input.placeholder = placeholder;
+          setTimeout(() => {
+            input.placeholder = '';
+            input.style.width = `${content[dayIndex].answer.length}ch`;
+          }, 1000);
+        }
+      }
+    });
+  }
+};
+
+render(currentDayIndex);
+
+let touchstartX = 0;
+let touchendX = 0;
+let swipeCounter = 0;
+
+const handleGesture = (direction) => {
+  console.log('Direction', direction);
+  switch (direction) {
+    case 'left':
+      swipeCounter < currentDayIndex && swipeCounter++;
+      break;
+    case 'right':
+      swipeCounter > 0 && swipeCounter--;
+      break;
+  }
+  const dayIndex = currentDayIndex - swipeCounter;
+  if (dayIndex <= currentDayIndex && dayIndex >= 0) {
+    render(dayIndex);
+  } else {
+    render(currentDayIndex);
+  }
+};
+
+document.addEventListener('touchstart', (event) => {
+  touchstartX = event.changedTouches[0].screenX;
+});
+
+document.addEventListener('touchend', (event) => {
+  touchendX = event.changedTouches[0].screenX;
+  const diff = touchendX - touchstartX;
+  const direction = diff < 0 ? 'right' : 'left';
+  handleGesture(direction);
+});
+
+let mousedownX = 0;
+let mouseupX = 0;
+
+document.addEventListener('mousedown', (event) => {
+  mousedownX = event.screenX;
+});
+
+document.addEventListener('mouseup', (event) => {
+  mouseupX = event.screenX;
+  const diff = mouseupX - mousedownX;
+  const direction = diff < 0 ? 'right' : 'left';
+  Math.abs(diff) > 100 && handleGesture(direction);
+});
